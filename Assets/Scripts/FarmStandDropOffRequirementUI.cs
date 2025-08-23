@@ -2,30 +2,24 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class DropOffRequirementUI : MonoBehaviour
+//TODO: this clones DropOffRequirementUI - make an abstract once you have a working test
+public class FarmStandDropOffRequirementUI : MonoBehaviour
 {
     public Image itemIcon; // Assign in Prefab
     public TextMeshProUGUI progressText; // Assign in Prefab
 
     private Transform target;
 
-    public void Initialize(Transform followTarget, Sprite icon, int totalRequired)
+    public void Initialize(Transform followTarget, Sprite icon)
     {
         target = followTarget;
         itemIcon.sprite = icon;
-        UpdateDropOffProgress(0, totalRequired);
+        UpdateDropOffProgress(0);
     }
 
-    public void InitializeFarmStand(Transform followTarget, Sprite icon, int totalRequired)
+    public void UpdateDropOffProgress(int current)
     {
-        target = followTarget;
-        itemIcon.sprite = icon;
-        UpdateDropOffProgress(0, totalRequired);
-    }
-
-    public void UpdateDropOffProgress(int current, int total)
-    {
-        progressText.text = $"{current}/{total}";
+        progressText.text = $"{current}";
     }
 
     public void SetVisible(bool isVisible)

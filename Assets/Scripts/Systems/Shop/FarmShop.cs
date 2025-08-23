@@ -2,8 +2,11 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
+public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler, IStructureUI
 {
+    [Header("Item Requirement Icon")]
+    public Sprite inputIcon;
+
     [Header("Production Variables")]    
     //UI Prefabs
     public GameObject dropOffRequirementUIPrefab;
@@ -13,7 +16,7 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
     //private ItemCosts priceList; //old, remove me once new code works
     private ShopPriceList shopPriceList;
     [SerializeField] float priceMultiplier = 1.0f;
-    private DropOffRequirementUI dropOffUI;
+    private FarmStandDropOffRequirementUI dropOffUI;
     private int maxSyrupRequired = 100;
     [SerializeField] private int minCustomerItems = 0;
     [SerializeField] private int maxCustomerItems = 10;
@@ -72,15 +75,15 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
         }
 
         GameObject dropOffUIObject = Instantiate(dropOffRequirementUIPrefab, mainCanvas.transform);
-        dropOffUI = dropOffUIObject.GetComponent<DropOffRequirementUI>();
+        dropOffUI = dropOffUIObject.GetComponent<FarmStandDropOffRequirementUI>();
         
         if (dropOffUI == null)
         {
-            UnityEngine.Debug.LogError("DropOffRequirementUI component not found on prefab!");
+            UnityEngine.Debug.LogError("FarmStandDropOffRequirementUI component not found on prefab!");
             return;
         }
 
-        dropOffUI.Initialize(this.transform, sapIcon, maxSyrupRequired); //TODO: update to syrup icon if one is available
+        dropOffUI.Initialize(this.transform, sapIcon); //TODO: update to syrup icon if one is available
     }
 
     public void HandleDropOff(PlayerObjects playerInventory)
@@ -186,5 +189,28 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
     {
         float price = shopPriceList.GetPrice(itemType);
         Debug.Log($"{itemType} costs {price} currency.");
+    }
+    
+    //TODO: duplicates BaseProductionMachine code. Both require this but other requirements vary. Inheritance/Composition may need to be reworked here in the future.
+    public virtual void InitializeUI()
+    {
+        if (dropOffUI != null)
+            return;
+
+        mainCanvas = FindObjectOfType<Canvas>();
+        if (!mainCanvas) { Debug.LogError("No Canvas found!"); return; }
+
+        Transform gameUIPanel = mainCanvas.transform.Find("GameUIPanel");
+        if (!gameUIPanel) { Debug.LogError("No GameUIPanel found in Canvas!"); return; }
+
+        // Initialize Timer UI
+        //GameObject timerUIObject = Instantiate(timerUIPrefab, gameUIPanel);
+        //timerUI = timerUIObject.GetComponent<SapTimerUI>();
+        //timerUI.Initialize(transform, isProducing);
+
+        // Initialize Drop-Off UI
+        GameObject dropOffUIObject = Instantiate(dropOffRequirementUIPrefab, gameUIPanel);
+        dropOffUI = dropOffUIObject.GetComponent<FarmStandDropOffRequirementUI>();
+        dropOffUI.Initialize(transform, inputIcon);
     }
 }
