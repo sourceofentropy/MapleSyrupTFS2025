@@ -39,7 +39,7 @@ public class UnlockZone : MonoBehaviour
     {
         isUnlocked = true;
         structureToUnlock.StartBuild();
-
+        Debug.Log($"attempt to unlock {structureToUnlock.structureName}");
         foreach (UnlockZone zone in unlocksNextZones)
         {
             zone.gameObject.SetActive(true);

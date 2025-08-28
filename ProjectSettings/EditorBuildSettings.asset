@@ -8,19 +8,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainMenuScene.unity
     guid: caa38e21ba6491c4a9c7a4355ce78ecc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/GameScene.unity
     guid: b124599a39c8d7648927a29f5dea8844
+  - enabled: 1
+    path: Assets/Scenes/EntropyFarmStandScene.unity
+    guid: ffaf32162b130974cb041776c0b4b1e4
   - enabled: 1
     path: Assets/Scenes/WinScene.unity
     guid: e2cf8a42a29c9374a885342ed4bdaf52
   - enabled: 1
     path: Assets/Scenes/GameOverScene.unity
     guid: d2f07472dfa549245a44d8e1e4ea872d
-  - enabled: 1
-    path: Assets/Scenes/Asset placement.unity
-    guid: 5ce1637e28c64f94f91ae607fdce2a8f
-  - enabled: 1
-    path: Assets/Scenes/AidenTestScene.unity
-    guid: 2578a1916356c25418a42a7021d021ab
   m_configObjects: {}

@@ -5096,6 +5096,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   structure: {fileID: 1582361818604223340}
   buildTime: 1
+  structureName: snow globe
 --- !u!1 &4467140274555815565
 GameObject:
   m_ObjectHideFlags: 0

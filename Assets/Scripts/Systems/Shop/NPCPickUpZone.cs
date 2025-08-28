@@ -6,7 +6,9 @@ public class NPCPickUpZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+
         UnityEngine.Debug.Log("we have a collision with " + other.gameObject.tag + " check if it matches " + agent);
+        UnityEngine.Debug.Log("Is it an npc?");
         string tag = other.gameObject.tag;
         if (other.CompareTag(AgentTypes.GetAgentTypeStringName(agent))) // Check if the correct agent type entered - defaults to NpcIndividual
         {

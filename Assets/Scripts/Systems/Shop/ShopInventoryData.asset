@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22d64af7b26f5b54890763ca4d1a0f68, type: 3}
-  m_Name: FarmStandInventoryAsset
+  m_Name: ShopInventoryData
   m_EditorClassIdentifier: 
-  name: 
+  why: why

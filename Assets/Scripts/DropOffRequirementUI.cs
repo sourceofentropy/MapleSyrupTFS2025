@@ -16,6 +16,13 @@ public class DropOffRequirementUI : MonoBehaviour
         UpdateDropOffProgress(0, totalRequired);
     }
 
+    public void InitializeFarmStand(Transform followTarget, Sprite icon, int totalRequired)
+    {
+        target = followTarget;
+        itemIcon.sprite = icon;
+        UpdateDropOffProgress(0, totalRequired);
+    }
+
     public void UpdateDropOffProgress(int current, int total)
     {
         progressText.text = $"{current}/{total}";

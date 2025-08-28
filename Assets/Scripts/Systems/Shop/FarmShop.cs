@@ -2,22 +2,24 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
+public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler, IStructureUI
 {
+    [Header("Item Requirement Icon")]
+    public Sprite inputIcon;
+
     [Header("Production Variables")]    
     //UI Prefabs
     public GameObject dropOffRequirementUIPrefab;
     [SerializeField] private ShopInventory inventory;
+    [SerializeField] private ShopInventory inventoryPartDeux;
     private ItemTypes shopItemTypes;
-    private ItemCosts priceList;
+    //private ItemCosts priceList; //old, remove me once new code works
+    private ShopPriceList shopPriceList;
     [SerializeField] float priceMultiplier = 1.0f;
-    private DropOffRequirementUI dropOffUI;
+    private FarmStandDropOffRequirementUI dropOffUI;
     private int maxSyrupRequired = 100;
-    private int currentSyrupCount = 0; 
-    public string displaySyrupCount = "0";
     [SerializeField] private int minCustomerItems = 0;
     [SerializeField] private int maxCustomerItems = 10;
-    private int totalItemsInShop = 0; //tally of number of items in shop - required for npc pickup to work without infinite loops
     private ItemTypes.Types itemToBuyKey;
     private string itemToBuyStr;
     [SerializeField] private Wallet playerWallet;
@@ -30,8 +32,9 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
     private void Start()
     {
         shopItemTypes = new ItemTypes();
-        priceList = new ItemCosts();
+        shopPriceList = new ShopPriceList();
 
+        /*
         //hard code cost list for bug workaround
         priceList.costDict[ItemTypes.Types.Sap] = 1f;
         priceList.costDict[ItemTypes.Types.Sap] = 1f;
@@ -50,7 +53,7 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
         inventory.currentStockDict[ItemTypes.Types.SyrupBottleFiltered] = 0;
         inventory.currentStockDict[ItemTypes.Types.TaffyTray] = 0;
         inventory.currentStockDict[ItemTypes.Types.TaffyBox] = 0;
-        inventory.currentStockDict[ItemTypes.Types.IceCreamBucket] = 0;
+        inventory.currentStockDict[ItemTypes.Types.IceCreamBucket] = 0;*/
         //currentStockDict[ItemTypes.Types.SnowCandySingle] = 0;
         //currentStockDict[ItemTypes.Types.SnowCandyBox] = 0;
         //costDict[ItemTypes.Types.SnowCandySingle] = 1f;
@@ -59,8 +62,9 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
         {
             //var numHeld = playerInventory.GetItemCountByTag(itemType.ToString());
             //playerInventory.DropOffItems(numHeld, itemType.ToString(), this.transform);
-            inventory.currentStockDict[itemType] += 0;
-            UnityEngine.Debug.Log($"{itemType} start test at farm stand! Current inventory: {inventory.currentStockDict[itemType]}");
+
+            //put me back - inventory.currentStockDict[itemType] += 0;
+            //UnityEngine.Debug.Log($"{itemType} start test at farm stand! Current inventory: {inventory.currentStockDict[itemType]}");
         }
 
         mainCanvas = GameObject.FindObjectOfType<Canvas>();
@@ -71,15 +75,15 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
         }
 
         GameObject dropOffUIObject = Instantiate(dropOffRequirementUIPrefab, mainCanvas.transform);
-        dropOffUI = dropOffUIObject.GetComponent<DropOffRequirementUI>();
+        dropOffUI = dropOffUIObject.GetComponent<FarmStandDropOffRequirementUI>();
         
         if (dropOffUI == null)
         {
-            UnityEngine.Debug.LogError("DropOffRequirementUI component not found on prefab!");
+            UnityEngine.Debug.LogError("FarmStandDropOffRequirementUI component not found on prefab!");
             return;
         }
 
-        dropOffUI.Initialize(this.transform, sapIcon, maxSyrupRequired); //TODO: update to syrup icon if one is available
+        dropOffUI.Initialize(this.transform, sapIcon); //TODO: update to syrup icon if one is available
     }
 
     public void HandleDropOff(PlayerObjects playerInventory)
@@ -108,8 +112,9 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
             if (numHeld > 0)
             {
                 playerInventory.DropOffItems(numHeld, itemType.ToString(), this.transform);
-                inventory.currentStockDict[itemType] += numHeld;
-                UnityEngine.Debug.Log($"{itemType} dropped off at farm stand! Current inventory: {inventory.currentStockDict[itemType]}");
+                //put me back - inventory.currentStockDict[itemType] += numHeld;
+                inventoryPartDeux.ModifyQuantity(itemType, numHeld);
+                //UnityEngine.Debug.Log($"{itemType} dropped off at farm stand! Current inventory: {inventory.currentStockDict[itemType]}");
             }
             else
             {
@@ -122,8 +127,6 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
     /* TODO: update to handle NPC pickups */
     public void HandlePickup()
     {
-        UnityEngine.Debug.Log($"thing {inventory.currentStockDict[ItemTypes.Types.Sap]}");
-        //NPC will roll the number of items they want between min/max       
         int itemsWanted = UnityEngine.Random.Range(minCustomerItems, maxCustomerItems); // Generates a number between 1 and 9
         UnityEngine.Debug.Log($"NPC came to pick up {minCustomerItems}!");
 
@@ -134,42 +137,80 @@ public class FarmShop : MonoBehaviour, IDropOffHandler, INPCPickUpHandler
             //ItemTypes.Types itemType in System.Enum.GetValues(typeof(ItemTypes.Types))
 
             itemToBuyKey = shopItemTypes.GetRandomEnumKey();
-            //itemToBuyStr = itemToBuyKey.ToString();
+            itemToBuyStr = itemToBuyKey.ToString();
 
-            ItemTypes.Types enumFromValue = (ItemTypes.Types)itemToBuyKey;
+            ItemTypes.Types itemKey = (ItemTypes.Types)itemToBuyKey;
 
-            UnityEngine.Debug.Log($"NPC wants a {itemToBuyKey}!");
-
-
+            UnityEngine.Debug.Log($"NPC wants a {itemToBuyKey}! / {itemToBuyStr}");
+            
             //if it's not in stock check for a different item
-            if (inventory.currentStockDict[itemToBuyKey] == 0)
+            if (inventoryPartDeux.GetQuantity(itemKey) == 0)
             {
                 UnityEngine.Debug.Log($"NPC wants a {itemToBuyStr}: none in stock!");
                 itemToBuyKey = shopItemTypes.GetRandomEnumKey();
-                UnityEngine.Debug.Log($"NPC will try a {itemToBuyStr} instead if it's in stock but will give up if it's not and move on to their next wanted item!");
+                itemToBuyStr = itemToBuyKey.ToString();
+                UnityEngine.Debug.Log($"NPC will try a {itemToBuyKey} - {itemToBuyStr} instead if it's in stock but will give up if it's not and move on to their next wanted item!");
             }
-            
+
             //if there is stock buy one, but if not we only check once for an alternate and then keep moving, odd but that's the logic for now
-            if (inventory.currentStockDict[itemToBuyKey] > 0)
-            {                
-                inventory.currentStockDict[itemToBuyKey] -= 1;
-                float payment = priceList.costDict[itemToBuyKey] * priceMultiplier;
-                UnityEngine.Debug.Log($"NPC buys a {itemToBuyKey} for {payment} beaver bucks!");
-                playerWallet.GetMoney(payment);
+            if (inventoryPartDeux.GetQuantity(itemKey) > 0)
+            {
+
+                Debug.Log($"attempting to get price for {itemKey}");
+                foreach (KeyValuePair<ItemTypes.Types, float> p in shopPriceList.Prices)
+                {
+                    UnityEngine.Debug.Log($"price list {p.Key}, {p.Value}");
+                }
+                float price = shopPriceList.GetPrice(itemKey);
+                inventoryPartDeux.ModifyQuantity(itemKey, -1);
+
+                UnityEngine.Debug.Log($"NPC buys a {itemToBuyKey} for {price} beaver bucks!");
+                //playerWallet.GetMoney(price);
+                GameManager.Instance.ReceiveMoney((int)price);
             }            
+            
             //iterate items wanted whether the npc got what they wanted or not
 
             //TODO: may wish to have items wanted progress over the course of the game in the future
         }
     }
 
-    private void UpdateTotalItems()
+    private void BuyItem()
     {
-        var totalItemsCounted = 0;
-        foreach (ItemTypes.Types itemType in System.Enum.GetValues(typeof(ItemTypes.Types)))
-        {
-            totalItemsCounted += inventory.currentStockDict[itemType];
-        }
-        totalItemsInShop = totalItemsCounted;
+
+    }
+
+    private void StockItem()
+    {
+
+    }
+
+    private void GetItemPrice(ItemTypes.Types itemType)
+    {
+        float price = shopPriceList.GetPrice(itemType);
+        Debug.Log($"{itemType} costs {price} currency.");
+    }
+    
+    //TODO: duplicates BaseProductionMachine code. Both require this but other requirements vary. Inheritance/Composition may need to be reworked here in the future.
+    public virtual void InitializeUI()
+    {
+        if (dropOffUI != null)
+            return;
+
+        mainCanvas = FindObjectOfType<Canvas>();
+        if (!mainCanvas) { Debug.LogError("No Canvas found!"); return; }
+
+        Transform gameUIPanel = mainCanvas.transform.Find("GameUIPanel");
+        if (!gameUIPanel) { Debug.LogError("No GameUIPanel found in Canvas!"); return; }
+
+        // Initialize Timer UI
+        //GameObject timerUIObject = Instantiate(timerUIPrefab, gameUIPanel);
+        //timerUI = timerUIObject.GetComponent<SapTimerUI>();
+        //timerUI.Initialize(transform, isProducing);
+
+        // Initialize Drop-Off UI
+        GameObject dropOffUIObject = Instantiate(dropOffRequirementUIPrefab, gameUIPanel);
+        dropOffUI = dropOffUIObject.GetComponent<FarmStandDropOffRequirementUI>();
+        dropOffUI.Initialize(transform, inputIcon);
     }
 }

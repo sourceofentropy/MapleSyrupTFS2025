@@ -17,6 +17,14 @@ public class AgentController : MonoBehaviour
 
     [SerializeField] private bool isWaiting = false; // Tracks whether NPC is pausing
 
+    private Rigidbody rb;
+
+    void Awake()
+    {
+        // Get the Rigidbody component on the same GameObject
+        rb = GetComponent<Rigidbody>();
+    }
+
     void FixedUpdate()
     {        
         if (destinations == null || destinations.path.Count == 0 || isWaiting) return; // No movement if empty or waiting
@@ -28,12 +36,15 @@ public class AgentController : MonoBehaviour
         if (direction != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         }
 
         // Move NPC towards the target
-        transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.fixedDeltaTime);
-
+        //transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.fixedDeltaTime);
+        
+        Vector3 moveDirection = direction * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + moveDirection);
+        
         // Check if NPC reached the target
         if (Vector3.Distance(transform.position, targetPosition) < stopDistance)
         {

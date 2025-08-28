@@ -7,7 +7,7 @@ public class Wallet : AbstractSOContainer
 {
 
     #region variables and properties
-    private float money = 0;
+    [SerializeField] private float money = 0;
     public float Money
     {
         get { return money; }

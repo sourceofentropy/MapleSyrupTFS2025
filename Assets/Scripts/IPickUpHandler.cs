@@ -1,4 +1,4 @@
-public interface INPCPickUpHandler
+public interface IPickUpHandler
 {
-    void HandlePickup();
+    void HandlePickup(PlayerObjects player);
 }
