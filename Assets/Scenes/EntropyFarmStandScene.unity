@@ -12077,17 +12077,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 79ad251431714504e9169eb4b56fa55f, type: 3}
---- !u!114 &1843607886 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 62681792123490110, guid: 54bc6a98cab39ce4285d04be74a48131, type: 3}
-  m_PrefabInstance: {fileID: 7421521443632587939}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdf332ba2695e004e9c865a7ba33350c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1857703980
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13207,7 +13196,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   price: 10
-  structureToUnlock: {fileID: 1843607886}
+  structureToUnlock: {fileID: 0}
   isFirstPoint: 0
   unlocksNextZones:
   - {fileID: 2087727243}
