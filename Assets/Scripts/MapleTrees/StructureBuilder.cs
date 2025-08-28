@@ -8,6 +8,7 @@ public class StructureBuilder : MonoBehaviour
 
     public Transform structure;
     public float buildTime = 1f;
+    public string structureName;
 
 
     public void Start()
